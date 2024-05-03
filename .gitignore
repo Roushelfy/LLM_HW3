@@ -1,2 +1,6 @@
 detect-pretrain-code/
 detected_model/
+opt-350m/
+results/
+results2/
+bbc_news/

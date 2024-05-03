@@ -37,7 +37,7 @@ if __name__ == "__main__":
     tokenizer = AutoTokenizer.from_pretrained("detected_model")
     model = AutoModelForCausalLM.from_pretrained("detected_model", torch_dtype=torch.bfloat16).to(device)
     # Load data from valid.json
-    with open('dataset/valid.json', 'r', encoding='utf-8') as f:
+    with open('dataset/myvalid.json', 'r', encoding='utf-8') as f:
         valid_data = json.load(f)
 
     perplexities = []
