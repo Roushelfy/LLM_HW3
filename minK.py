@@ -37,7 +37,7 @@ if __name__ == "__main__":
     tokenizer = AutoTokenizer.from_pretrained("detected_model")
     model = AutoModelForCausalLM.from_pretrained("detected_model", torch_dtype=torch.bfloat16).to(device)
     # Load data from valid.json
-    with open('dataset/myvalid.json', 'r', encoding='utf-8') as f:
+    with open('dataset/valid.json', 'r', encoding='utf-8') as f:
         valid_data = json.load(f)
 
     perplexities = []
@@ -64,6 +64,17 @@ if __name__ == "__main__":
     for r, min_k_value in zip(ratio, min_k):
         auc_k = roc_auc_score(labels, min_k_value)
         print(f"K: {r}, AUC: {auc_k}")
+        
+        fpr, tpr, thresholds = roc_curve(labels, min_k_value)
+        youden_index = tpr - fpr
+        optimal_threshold = thresholds[np.argmax(youden_index)]
+        print(f"Optimal Threshold for K={r}: {optimal_threshold}")
+        predictions = [1 if loss > optimal_threshold else 0 for loss in min_k_value]
+
+        # Calculate accuracy
+        accuracy = accuracy_score(labels, predictions)
+        print(f"Accuracy for K={r}: {accuracy}")
+
     
     # Calculate AUC for loss
     auc_loss = roc_auc_score(labels, all_losses)
