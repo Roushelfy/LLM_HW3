@@ -3,7 +3,7 @@ import torch
 import numpy as np
 import json
 from tqdm import tqdm
-from sklearn.metrics import roc_auc_score, accuracy_score
+from sklearn.metrics import roc_auc_score, accuracy_score,roc_curve
 
 def calculatePerplexity(sentence, model, tokenizer,device):
     inputs = tokenizer(sentence, return_tensors="pt").to(device)
@@ -68,3 +68,13 @@ if __name__ == "__main__":
     # Calculate AUC for loss
     auc_loss = roc_auc_score(labels, all_losses)
     print(f"Loss AUC: {auc_loss}")
+
+    fpr, tpr, thresholds = roc_curve(labels, all_losses)
+    youden_index = tpr - fpr
+    optimal_threshold = thresholds[np.argmax(youden_index)]
+    print(f"Optimal Threshold: {optimal_threshold}")
+    predictions = [1 if loss > optimal_threshold else 0 for loss in all_losses]
+
+    # Calculate accuracy
+    accuracy = accuracy_score(labels, predictions)
+    print(f"Accuracy: {accuracy}")
