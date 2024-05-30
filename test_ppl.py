@@ -14,11 +14,12 @@ from transformers import AdamW
 import random
 
 
-def calculatePerplexity(sentence, model, tokenizer,device):
-    inputs = tokenizer(sentence, max_length=2048, padding="longest", truncation=True, return_tensors="pt").to(device)
-    input_ids=inputs.input_ids
+def calculatePerplexity(sentence, model, tokenizer, device):
+    inputs = tokenizer(sentence, max_length=2048, padding="longest",
+                       truncation=True, return_tensors="pt").to(device)
+    input_ids = inputs.input_ids
     with torch.no_grad():
-        output = model(**inputs,labels=input_ids)
+        output = model(**inputs, labels=input_ids)
         logits = output.logits
         loss = output.loss
 
@@ -35,19 +36,19 @@ def calculatePerplexity(sentence, model, tokenizer,device):
 
 
 if __name__ == "__main__":
-     # Setup device (CUDA if available, else CPU)
+    # Setup device (CUDA if available, else CPU)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     # device = "cpu"
     print(f"Using device: {device}")
-    with open('dataset/valid.json', 'r', encoding='utf-8') as f:
+    with open('dataset/myvalid.json', 'r', encoding='utf-8') as f:
         valid_data = json.load(f)
     # models = ["opt-350m", "detected_model", "results2/final"]
-    # for i in range(1, 10):
-    #     models.append(f"results/checkpoint-{i*10}")
+    models = ["opt-350m", "detected_model"]
+    for i in range(1, 10):
+        models.append(f"results/checkpoint-{i*10}")
     # for i in range(1, 17):
     #     models.append(f"results2/checkpoint-{i*10}")
-    models = ["opt-350m"]
-    
+
     for model_path in models:
         tokenizer = AutoTokenizer.from_pretrained("results2/final")
         model = AutoModelForCausalLM.from_pretrained(model_path).to(device)
@@ -60,17 +61,19 @@ if __name__ == "__main__":
         # Calculate perplexity
         for entry in tqdm(valid_data, desc="Calculating perplexities"):
             text = entry["text"]
-            label = "dirty"
-            # label = entry["label"]
-            if random.random() > 0.5:
+            # label = "dirty"
+            label = entry["label"]
+            if label == "dirty":
                 continue
-            ppx, all_prob, mean_prob,loss = calculatePerplexity(text, model, tokenizer, device)
+            ppx, all_prob, mean_prob, loss = calculatePerplexity(
+                text, model, tokenizer, device)
             all_probs.append(all_prob)
             all_losses.append(loss)
             perplexities.append(ppx)
-            labels.append(1 if label == "dirty" else 0)  # Convert labels to binary format
+            # Convert labels to binary format
+            labels.append(1 if label == "dirty" else 0)
         print(model_path, "valid", sum(perplexities) / len(perplexities))
-        
+
         # perplexities = []
         # labels = []
         # all_probs = []
@@ -83,4 +86,3 @@ if __name__ == "__main__":
         #     all_losses.append(loss)
         #     perplexities.append(ppx)
         # print(model_path, "collected", sum(perplexities) / len(perplexities))
-        

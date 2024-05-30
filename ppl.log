@@ -1,0 +1,12 @@
+Using device: cuda
+opt-350m valid 19.48899482506002
+detected_model valid 14.996239244658277
+results/checkpoint-10 valid 16.615849909147343
+results/checkpoint-20 valid 16.109620501110886
+results/checkpoint-30 valid 15.77740461697068
+results/checkpoint-40 valid 15.847805161149028
+results/checkpoint-50 valid 15.820256462067924
+results/checkpoint-60 valid 15.738226713480639
+results/checkpoint-70 valid 15.936774364917055
+results/checkpoint-80 valid 15.833743006585788
+results/checkpoint-90 valid 15.84002726871275
